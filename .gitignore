@@ -1,0 +1,5 @@
+.state/
+infra/*.json
+!infra/*parameters.json
+*.log
+.tools/

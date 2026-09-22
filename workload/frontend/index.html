@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SRE Day | Service Health</title>
+<script>
+  (() => {
+    const param = new URLSearchParams(window.location.search).get("scoutTheme");
+    const theme =
+      param || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    document.documentElement.setAttribute("data-theme", theme);
+  })();
+</script>
+<style>
+:root {
+  color-scheme: light;
+  --cp-bg: #f7f4ef;
+  --cp-bg-elevated: #fcfbf8;
+  --cp-surface: #ffffff;
+  --cp-surface-soft: #f5f5f5;
+  --cp-border: #dedede;
+  --cp-border-strong: #919191;
+  --cp-text: #242424;
+  --cp-text-muted: #5c5c5c;
+  --cp-text-soft: #6f6f6f;
+  --cp-accent: #b11f4b;
+  --cp-accent-hover: #9a1a41;
+  --cp-accent-soft: rgba(177, 31, 75, 0.08);
+  --cp-accent-fg: #ffffff;
+  --cp-success: #16a34a;
+  --cp-danger: #dc2626;
+  --cp-warning: #f59e0b;
+  --cp-link: #0078d4;
+  --cp-shadow: 0 18px 48px rgba(0, 0, 0, 0.12);
+  --cp-overlay: rgba(255, 255, 255, 0.8);
+  --cp-panel: rgba(255, 255, 255, 0.86);
+  --cp-panel-strong: rgba(255, 255, 255, 0.96);
+  --cp-sheen: rgba(255, 255, 255, 0.55);
+  --cp-highlight: rgba(177, 31, 75, 0.12);
+}
+html[data-theme="dark"] {
+  color-scheme: dark;
+  --cp-bg: #3d3b3a;
+  --cp-bg-elevated: #343231;
+  --cp-surface: #292929;
+  --cp-surface-soft: #2e2e2e;
+  --cp-border: #474747;
+  --cp-border-strong: #5f5f5f;
+  --cp-text: #dedede;
+  --cp-text-muted: #919191;
+  --cp-text-soft: #b0b0b0;
+  --cp-accent: #fd8ea1;
+  --cp-accent-hover: #fb7b91;
+  --cp-accent-soft: rgba(253, 142, 161, 0.14);
+  --cp-accent-fg: #1a1a1a;
+  --cp-success: #4ade80;
+  --cp-danger: #f87171;
+  --cp-warning: #fbbf24;
+  --cp-link: #4da6ff;
+  --cp-shadow: 0 18px 48px rgba(0, 0, 0, 0.32);
+  --cp-overlay: rgba(41, 41, 41, 0.88);
+  --cp-panel: rgba(41, 41, 41, 0.72);
+  --cp-panel-strong: rgba(41, 41, 41, 0.96);
+  --cp-sheen: rgba(255, 255, 255, 0.04);
+  --cp-highlight: rgba(253, 142, 161, 0.12);
+}
+* { box-sizing: border-box; letter-spacing: 0; }
+body { margin: 0; background: var(--cp-surface); color: var(--cp-text); font-family: "Segoe UI", Aptos, Calibri, -apple-system, BlinkMacSystemFont, sans-serif; }
+header { border-top: 4px solid var(--cp-accent); border-bottom: 1px solid var(--cp-border); background: var(--cp-surface); }
+.topline { max-width: 1200px; margin: auto; padding: 20px 32px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.brand { font-size: 20px; font-weight: 750; display: flex; gap: 12px; align-items: center; }
+.brand-mark { width: 24px; height: 24px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px; }
+.brand-mark span { background: var(--cp-accent); }
+.brand-mark span:nth-child(2), .brand-mark span:nth-child(6) { background: var(--cp-border-strong); }
+.environment { font-size: 13px; color: var(--cp-text-muted); }
+main { max-width: 1200px; margin: auto; padding: 36px 32px; }
+.heading { display: flex; justify-content: space-between; gap: 20px; align-items: start; margin-bottom: 28px; }
+h1 { margin: 4px 0 0; font-size: 32px; line-height: 1.2; font-weight: 650; }
+.eyebrow { color: var(--cp-text-muted); font-size: 12px; font-weight: 600; text-transform: uppercase; }
+button { border: 1px solid var(--cp-border-strong); background: var(--cp-surface); color: var(--cp-text); border-radius: 6px; padding: 10px 16px; font: inherit; font-size: 14px; min-width: 142px; cursor: pointer; }
+button:hover { background: var(--cp-surface-soft); }
+button:focus-visible { outline: 3px solid var(--cp-link); outline-offset: 3px; }
+.summary { border-top: 1px solid var(--cp-border); border-bottom: 1px solid var(--cp-border); background: linear-gradient(110deg, var(--cp-surface-soft), var(--cp-surface)); padding: 28px 24px; display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(120px, .6fr) minmax(140px, .7fr); gap: 24px; align-items: center; }
+.status-line { display: flex; align-items: center; gap: 12px; }
+.status-light { width: 14px; height: 14px; flex-shrink: 0; border-radius: 50%; background: var(--cp-border-strong); }
+h2 { font-size: 23px; margin: 0; font-weight: 600; }
+.detail { color: var(--cp-text-muted); font-size: 14px; margin: 8px 0 0 26px; line-height: 1.5; }
+.stat-label { color: var(--cp-text-muted); font-size: 12px; margin-bottom: 4px; }
+.stat { font-size: 28px; font-weight: 600; }
+.mono { font-family: Consolas, "Courier New", Courier, monospace; }
+.small { font-size: 14px; }
+.section-title { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: 30px 0 14px; }
+h3 { font-size: 16px; margin: 0; font-weight: 600; }
+.section-title span { font-size: 12px; color: var(--cp-text-muted); }
+.services { border-top: 1px solid var(--cp-border); }
+.service { display: grid; grid-template-columns: minmax(150px, 1fr) minmax(180px, 1.7fr) 90px 100px; gap: 18px; align-items: center; padding: 19px 8px; min-height: 77px; border-bottom: 1px solid var(--cp-border); }
+.service-name { font-weight: 600; font-size: 15px; }
+.service-path { font-size: 12px; color: var(--cp-text-muted); overflow-wrap: anywhere; }
+.service-detail { font-size: 12px; color: var(--cp-text-muted); margin-top: 5px; }
+.service-code { font-size: 12px; color: var(--cp-text-muted); margin-top: 4px; }
+.state { font-size: 13px; display: flex; align-items: center; gap: 7px; }
+.dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; background: var(--cp-border-strong); }
+[data-state="healthy"] .dot, .status-light[data-state="healthy"] { background: var(--cp-success); }
+[data-state="failed"] .dot, .status-light[data-state="degraded"], .status-light[data-state="unavailable"] { background: var(--cp-danger); }
+.lower { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+.history { height: 96px; width: 100%; display: block; background: var(--cp-surface-soft); }
+.history-axis { display: flex; justify-content: space-between; color: var(--cp-text-muted); font-size: 12px; margin-top: 8px; }
+.events { list-style: none; margin: 0; padding: 0; max-height: 140px; overflow: auto; }
+.events li { display: flex; gap: 16px; padding: 9px 0; font-size: 13px; border-bottom: 1px solid var(--cp-border); }
+.events time { color: var(--cp-text-muted); flex-shrink: 0; }
+footer { margin-top: 28px; border-top: 1px solid var(--cp-border); padding-top: 16px; display: flex; gap: 12px; justify-content: space-between; flex-wrap: wrap; font-size: 12px; color: var(--cp-text-muted); overflow-wrap: anywhere; }
+@media (max-width: 700px) {
+  .topline { padding: 16px; align-items: start; } main { padding: 24px 16px; }
+  .environment { max-width: 140px; text-align: right; line-height: 1.5; }
+  h1 { font-size: 28px; } .heading { gap: 10px; flex-wrap: wrap; }
+  .summary { grid-template-columns: 1fr 1fr; padding: 22px 16px; gap: 20px; }
+  .summary > :first-child { grid-column: 1 / -1; } h2 { font-size: 21px; }
+  .service { grid-template-columns: minmax(0, 1fr) 95px; gap: 8px 12px; padding: 16px 0; }
+  .service > :nth-child(2) { grid-column: 1; grid-row: auto; }
+  .service > :nth-child(3) { grid-column: 2; grid-row: 2; }
+  .service > :nth-child(4) { grid-column: 2; grid-row: 1; }
+  .lower { grid-template-columns: 1fr; gap: 0; }
+}
+@media (prefers-reduced-motion: no-preference) { main { animation: appear .35s ease-out; } @keyframes appear { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } } }
+</style>
+</head>
+<body>
+<header><div class="topline"><div class="brand"><div class="brand-mark" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>SRE DAY</div><div class="environment">DEMO / Sweden Central</div></div></header>
+<main>
+  <div class="heading"><div><div class="eyebrow">aks-srelab-swc-001 / srelab</div><h1>Service health</h1></div><button id="pause" type="button" aria-pressed="false">Pause updates</button></div>
+  <section class="summary" aria-label="Current service status">
+    <div><div class="status-line"><span id="light" class="status-light"></span><h2 id="overall" aria-live="polite">Connecting</h2></div><p class="detail" id="detail">Awaiting first observation</p></div>
+    <div><div class="stat-label">Healthy checks</div><div class="stat mono" id="count">-- / 6</div><div class="service-detail" id="operational-alert" role="status">Operations: awaiting evidence</div></div>
+    <div><div class="stat-label">Last observation</div><div class="stat small mono" id="observed">Not yet received</div><div class="service-detail" id="age">--</div></div>
+  </section>
+  <section aria-label="Dependency checks"><div class="section-title"><h3>Services &amp; dependencies</h3><span id="transport">Live requests</span></div><div class="services" id="services"></div></section>
+  <section aria-label="Operations and observability"><div class="section-title"><h3>Operations &amp; observability</h3><span id="operations-summary" role="status">Awaiting evidence</span></div><div class="services" id="operations"></div></section>
+  <div class="lower">
+    <section><div class="section-title"><h3>Request history</h3><span id="samples">0 observations</span></div><canvas class="history" id="history" aria-label="Healthy, failed and unknown observation history" role="img"></canvas><div class="history-axis"><span>Earlier</span><span>Latest</span></div></section>
+    <section><div class="section-title"><h3>Status changes</h3><span>This session</span></div><ol class="events" id="events"><li>Awaiting first observation</li></ol></section>
+  </div>
+  <footer><span id="instance">Pod: awaiting connection</span><span id="checked">No observation yet</span></footer>
+</main>
+<script>
+'use strict';
+const definitions = [
+  ['web', 'AKS Web', 'Browser > web Service > Node.js pod'],
+  ['backend', 'Backend API', 'AKS > private DNS > backend VM'],
+  ['client', 'Client API', 'AKS > client VM > backend VM'],
+  ['storage', 'Blob Storage', 'Client VM > private endpoint > Blob Storage'],
+  ['vault', 'Key Vault', 'Client VM > private endpoint > Key Vault'],
+  ['arm', 'Azure Resource Manager', 'Client VM > managed identity > ARM']
+];
+const elements = Object.fromEntries(['overall', 'detail', 'light', 'count', 'observed', 'age', 'services', 'events', 'history', 'samples', 'transport', 'instance', 'checked', 'pause'].map(id => [id, document.getElementById(id)]));
+let paused = false;
+let lastSnapshot = null;
+let lastState = '';
+let lastKey = '';
+const history = [];
+const events = [];
+const rows = new Map();
+const operationDefinitions = [
+  ['aks', 'AKS deployment'], ['operator', 'Kubernetes operator access'],
+  ['client-vm', 'Client VM power'], ['backend-vm', 'Backend VM power'],
+  ['cpu', 'Backend CPU'], ['memory', 'Backend memory'], ['disk', 'Backend data disk'],
+  ['ama', 'Monitoring agent'], ['client-heartbeat', 'Client telemetry'], ['backend-heartbeat', 'Backend telemetry']
+];
+const operationRows = new Map();
+let lastOperations = null;
+let operationsError = true;
+for (const [id, label] of operationDefinitions) {
+  const row = document.createElement('div'); row.className = 'service'; row.dataset.state = 'unknown'; row.dataset.check = id;
+  row.innerHTML = '<div class="service-name"></div><div class="service-detail">No current observation</div><div class="operation-age mono small">--</div><div class="state"><span class="dot"></span><span class="state-text">Unknown</span></div>';
+  row.querySelector('.service-name').textContent = label;
+  document.getElementById('operations').append(row); operationRows.set(id, row);
+}
+function operationalSummary(snapshot, unavailable, now = Date.now()) {
+  const checks = operationDefinitions.map(([id]) => {
+    const source = snapshot?.checks?.find(check => check.id === id);
+    const observed = Date.parse(source?.observedAt);
+    const current = !unavailable && Number.isFinite(observed) && now - observed >= 0 && now - observed <= 180000;
+    const state = current && ['healthy', 'failed'].includes(source?.state) ? source.state : 'unknown';
+    return { id, state, detail: current ? source.detail : 'No current observation', age: Number.isFinite(observed) ? Math.max(0, Math.floor((now - observed) / 1000)) : null };
+  });
+  const failed = checks.filter(check => check.state === 'failed').length;
+  const unknown = checks.filter(check => check.state === 'unknown').length;
+  return { checks, failed, unknown, title: failed ? `${failed} operational failure${failed === 1 ? '' : 's'}${unknown ? ` / ${unknown} unknown` : ''}` : unknown ? `${unknown} checks awaiting evidence` : 'Operations healthy' };
+}
+function renderOperations() {
+  const result = operationalSummary(lastOperations, operationsError || paused);
+  const summary = document.getElementById('operations-summary');
+  summary.textContent = result.title;
+  summary.style.color = result.failed ? 'var(--cp-danger)' : 'var(--cp-text-muted)';
+  const alert = document.getElementById('operational-alert');
+  alert.textContent = result.title; alert.style.color = summary.style.color;
+  for (const check of result.checks) {
+    const row = operationRows.get(check.id); row.dataset.state = check.state;
+    row.querySelector('.state-text').textContent = check.state === 'healthy' ? 'Healthy' : check.state === 'failed' ? 'Failed' : 'Unknown';
+    row.querySelector('.service-detail').textContent = check.detail;
+    row.querySelector('.operation-age').textContent = check.age === null ? '--' : `${check.age}s ago`;
+  }
+}
+async function pollOperations() {
+  if (!paused) {
+    try {
+      const response = await fetch('/api/operations', { cache: 'no-store', signal: AbortSignal.timeout(8000) });
+      if (!response.ok) throw new Error('Operations unavailable');
+      const result = await response.json();
+      if (result.version !== 1 || !Array.isArray(result.checks)) throw new Error('Invalid operations');
+      lastOperations = result; operationsError = false;
+    } catch { operationsError = true; }
+  }
+  renderOperations(); setTimeout(pollOperations, 5000);
+}
+for (const [id, label, route] of definitions) {
+  const row = document.createElement('div'); row.className = 'service'; row.dataset.state = 'unknown';
+  row.innerHTML = '<div><div class="service-name"></div><div class="service-code mono">--</div></div><div><div class="service-path"></div><div class="service-detail">No observation</div></div><div class="latency mono small">--</div><div class="state"><span class="dot"></span><span class="state-text">Unknown</span></div>';
+  row.querySelector('.service-name').textContent = label;
+  row.querySelector('.service-path').textContent = route;
+  elements.services.append(row); rows.set(id, row);
+}
+function drawHistory() {
+  const canvas = elements.history;
+  const ratio = window.devicePixelRatio || 1;
+  const width = canvas.clientWidth; const height = canvas.clientHeight;
+  canvas.width = width * ratio; canvas.height = height * ratio;
+  const context = canvas.getContext('2d'); context.scale(ratio, ratio);
+  const style = getComputedStyle(document.documentElement);
+  const colors = { healthy: '--cp-success', degraded: '--cp-danger', unavailable: '--cp-danger', unknown: '--cp-border-strong' };
+  const slot = width / 60;
+  history.forEach((sample, index) => { context.fillStyle = style.getPropertyValue(colors[sample] || colors.unknown); context.fillRect((60 - history.length + index) * slot + 1, 18, Math.max(1, slot - 3), height - 36); });
+  elements.samples.textContent = `${history.length} observations`;
+}
+function changeState(state, title) {
+  elements.overall.textContent = title; elements.light.dataset.state = state;
+  if (lastState === state) return;
+  events.unshift({ time: new Date().toLocaleTimeString(), title });
+  events.splice(12); elements.events.replaceChildren();
+  for (const event of events) { const item = document.createElement('li'); const time = document.createElement('time'); time.textContent = event.time; const text = document.createElement('span'); text.textContent = event.title; item.append(time, text); elements.events.append(item); }
+  lastState = state;
+}
+function render(snapshot, error) {
+  const observed = snapshot?.observedAt && Date.parse(snapshot.observedAt);
+  const age = observed ? Math.max(0, Math.floor((Date.now() - observed) / 1000)) : null;
+  const limit = snapshot?.transport === 'aks-run-command' ? 120 : 45;
+  const stale = !observed || !Number.isFinite(observed) || age > limit || snapshot?.stale;
+  const valid = !paused && !error && !stale;
+  const unavailable = valid && snapshot?.overall === 'unavailable';
+  const checks = new Map((valid ? snapshot?.checks || [] : []).map(check => [check.id, check]));
+  const healthy = [...checks.values()].filter(check => check.healthy).length;
+  const state = valid ? (unavailable ? 'unavailable' : healthy === 6 ? 'healthy' : 'degraded') : 'unknown';
+  const title = paused ? 'Updates paused' : state === 'healthy' ? 'Applications healthy' : state === 'degraded' ? 'Service degraded' : state === 'unavailable' ? 'Web application unavailable' : error ? 'Observation unavailable' : 'Awaiting fresh data';
+  changeState(state, title);
+  elements.detail.textContent = paused ? 'Observations paused in this browser' : error || (unavailable ? 'Web request failed from the AKS probe' : stale ? 'No current health result' : `${healthy} of 6 requests succeeded`);
+  elements.count.textContent = valid && !unavailable ? `${healthy} / 6` : '-- / 6';
+  elements.observed.textContent = observed ? new Date(observed).toLocaleTimeString() : 'Not yet received';
+  elements.age.textContent = age === null ? '--' : `${age}s ago${stale ? ' / stale' : ''}`;
+  elements.transport.textContent = snapshot?.transport === 'aks-run-command' ? 'Private relay / delayed observations' : 'Live requests';
+  elements.instance.textContent = `Pod: ${snapshot?.instance || 'unavailable'}`;
+  elements.checked.textContent = observed ? `Observed ${new Date(observed).toLocaleDateString()}` : 'No observation yet';
+  for (const [id, row] of rows) {
+    const check = checks.get(id); const failedWeb = unavailable && id === 'web';
+    row.dataset.state = check ? check.healthy ? 'healthy' : 'failed' : failedWeb ? 'failed' : 'unknown';
+    row.querySelector('.state-text').textContent = check ? check.healthy ? 'Healthy' : 'Failed' : failedWeb ? 'Unavailable' : 'Unknown';
+    row.querySelector('.service-code').textContent = check?.code ? `HTTP ${check.code}` : '--';
+    row.querySelector('.latency').textContent = Number.isFinite(check?.latencyMs) ? `${check.latencyMs} ms` : '--';
+    row.querySelector('.service-detail').textContent = check?.detail || (failedWeb ? 'Request did not reach the web application' : 'No current observation');
+  }
+  const key = `${snapshot?.observedAt || ''}:${state}`;
+  if (key !== lastKey) { history.push(state); if (history.length > 60) history.shift(); drawHistory(); lastKey = key; }
+}
+let lastError = '';
+async function poll() {
+  if (!paused) {
+    try {
+      const response = await fetch('/api/status', { cache: 'no-store', signal: AbortSignal.timeout(8000) });
+      if (!response.ok) throw new Error('No current response from the observation path');
+      const snapshot = await response.json();
+      if (snapshot.version !== 1 || !Array.isArray(snapshot.checks)) throw new Error('Invalid observation');
+      lastSnapshot = snapshot; lastError = ''; render(snapshot, '');
+    } catch (error) { lastError = error.message; render(lastSnapshot, lastError); }
+  }
+  setTimeout(poll, 5000);
+}
+elements.pause.addEventListener('click', () => { paused = !paused; elements.pause.textContent = paused ? 'Resume updates' : 'Pause updates'; elements.pause.setAttribute('aria-pressed', String(paused)); render(lastSnapshot, lastError); });
+window.addEventListener('resize', drawHistory);
+setInterval(() => { if (lastSnapshot) render(lastSnapshot, lastError); renderOperations(); }, 1000);
+drawHistory(); void poll(); void pollOperations();
+</script>
+</body>
+</html>

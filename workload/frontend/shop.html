@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fieldnote | Shop</title>
+<script>
+(() => {
+  const param = new URLSearchParams(window.location.search).get('scoutTheme');
+  const theme = param || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  document.documentElement.setAttribute('data-theme', theme);
+})();
+</script>
+<style>
+:root {
+  color-scheme: light;
+  --cp-bg: #f7f4ef;
+  --cp-bg-elevated: #fcfbf8;
+  --cp-surface: #ffffff;
+  --cp-surface-soft: #f5f5f5;
+  --cp-border: #dedede;
+  --cp-border-strong: #919191;
+  --cp-text: #242424;
+  --cp-text-muted: #5c5c5c;
+  --cp-text-soft: #6f6f6f;
+  --cp-accent: #b11f4b;
+  --cp-accent-hover: #9a1a41;
+  --cp-accent-soft: rgba(177, 31, 75, 0.08);
+  --cp-accent-fg: #ffffff;
+  --cp-success: #16a34a;
+  --cp-danger: #dc2626;
+  --cp-warning: #f59e0b;
+  --cp-link: #0078d4;
+  --cp-shadow: 0 18px 48px rgba(0, 0, 0, 0.12);
+  --cp-overlay: rgba(255, 255, 255, 0.8);
+  --cp-panel: rgba(255, 255, 255, 0.86);
+  --cp-panel-strong: rgba(255, 255, 255, 0.96);
+  --cp-sheen: rgba(255, 255, 255, 0.55);
+  --cp-highlight: rgba(177, 31, 75, 0.12);
+}
+html[data-theme="dark"] {
+  color-scheme: dark;
+  --cp-bg: #3d3b3a;
+  --cp-bg-elevated: #343231;
+  --cp-surface: #292929;
+  --cp-surface-soft: #2e2e2e;
+  --cp-border: #474747;
+  --cp-border-strong: #5f5f5f;
+  --cp-text: #dedede;
+  --cp-text-muted: #919191;
+  --cp-text-soft: #b0b0b0;
+  --cp-accent: #fd8ea1;
+  --cp-accent-hover: #fb7b91;
+  --cp-accent-soft: rgba(253, 142, 161, 0.14);
+  --cp-accent-fg: #1a1a1a;
+  --cp-success: #4ade80;
+  --cp-danger: #f87171;
+  --cp-warning: #fbbf24;
+  --cp-link: #4da6ff;
+  --cp-shadow: 0 18px 48px rgba(0, 0, 0, 0.32);
+  --cp-overlay: rgba(41, 41, 41, 0.88);
+  --cp-panel: rgba(41, 41, 41, 0.72);
+  --cp-panel-strong: rgba(41, 41, 41, 0.96);
+  --cp-sheen: rgba(255, 255, 255, 0.04);
+  --cp-highlight: rgba(253, 142, 161, 0.12);
+}
+*{box-sizing:border-box;letter-spacing:0}body{margin:0;font:16px/1.5 "Segoe UI",Aptos,Calibri,sans-serif;background:var(--cp-surface);color:var(--cp-text)}
+button,input,select{font:inherit}button,a,input,select{touch-action:manipulation}button{cursor:pointer;border:1px solid var(--cp-border);border-radius:6px;padding:10px 16px;background:var(--cp-surface);color:var(--cp-text)}button:hover{border-color:var(--cp-accent)}button:disabled{opacity:.5;cursor:wait}a{color:var(--cp-link)}:focus-visible{outline:3px solid var(--cp-link);outline-offset:3px}
+header{border-bottom:1px solid var(--cp-border)}.bar{max-width:1320px;margin:auto;padding:20px 32px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap}.brand{font-size:28px;font-weight:750;color:var(--cp-text);text-decoration:none}.brand span{color:var(--cp-accent)}nav{display:flex;gap:24px;align-items:center;flex-wrap:wrap;font-size:14px}.ops{font-size:13px;color:var(--cp-text-muted)}.ops[data-failed="true"]{color:var(--cp-danger);font-weight:700}
+main{max-width:1320px;margin:auto;padding:36px 32px}.intro{display:flex;justify-content:space-between;align-items:end;gap:24px;margin-bottom:28px}.eyebrow{text-transform:uppercase;font-size:12px;font-weight:700;color:var(--cp-accent);margin:0 0 8px}h1{font-size:36px;line-height:1.15;margin:0}h2{font-size:22px;margin:0 0 18px}h3{font-size:18px;margin:0}.muted{color:var(--cp-text-muted)}.intro p:last-child{margin:10px 0 0}.layout{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:36px}.filters{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:22px}input,select{padding:10px 12px;background:var(--cp-surface);border:1px solid var(--cp-border);border-radius:6px;color:var(--cp-text);min-width:0}.filters input{flex:1;min-width:140px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:28px 22px}.product{min-width:0;animation:appear .35s ease both}.media{aspect-ratio:4/3;background:var(--cp-surface-soft);border-radius:8px;display:flex;align-items:center;justify-content:center;overflow:hidden;color:var(--cp-text-muted);font-size:14px;text-align:center}.media img{width:100%;height:100%;object-fit:cover}.product-info{padding-top:14px}.product-info p{font-size:14px;min-height:42px;margin:8px 0 14px;color:var(--cp-text-muted)}.product-heading{display:flex;gap:12px;justify-content:space-between;align-items:start}.price{white-space:nowrap;font-weight:650}.product button{width:100%;background:var(--cp-text);color:var(--cp-surface);border-color:var(--cp-text)}.notice{margin:0 0 18px;border-left:3px solid var(--cp-danger);padding:12px 16px;background:var(--cp-surface-soft);color:var(--cp-danger)}.notice:empty{display:none}
+aside{border-left:1px solid var(--cp-border);padding-left:28px;min-width:0}.cart-line{border-bottom:1px solid var(--cp-border);padding:14px 0}.cart-line:first-child{padding-top:0}.cart-top{display:flex;gap:10px;justify-content:space-between;font-size:14px;font-weight:600}.quantity{display:flex;align-items:center;gap:12px;margin-top:12px}.quantity button{width:34px;height:34px;padding:0;font-size:20px}.quantity output{min-width:18px;text-align:center}.quantity .remove{width:auto;font-size:12px;margin-left:auto;padding:0 6px;border:0;color:var(--cp-text-muted)}.total{display:flex;justify-content:space-between;font-size:19px;font-weight:700;margin:24px 0 16px}.primary{background:var(--cp-accent);color:var(--cp-accent-fg);border-color:var(--cp-accent);width:100%}.primary:hover{background:var(--cp-accent-hover)}.small{font-size:12px}.receipt{border-top:3px solid var(--cp-success);padding-top:18px;margin-top:26px;overflow-wrap:anywhere}.receipt strong{color:var(--cp-success)}.lookup{margin-top:30px;border-top:1px solid var(--cp-border);padding-top:22px}.lookup label{display:block;font-size:14px;margin-bottom:8px}.lookup input{width:100%;margin-bottom:10px}.lookup button{width:100%}footer{border-top:1px solid var(--cp-border);max-width:1256px;margin:20px auto 0;padding:24px 0;font-size:12px;color:var(--cp-text-muted)}[hidden]{display:none!important}@keyframes appear{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}@media(prefers-reduced-motion:reduce){*{animation:none!important}}@media(max-width:850px){.layout{grid-template-columns:minmax(0,1fr)}aside{border-left:0;border-top:1px solid var(--cp-border);padding:26px 0 0}.bar,main{padding-left:20px;padding-right:20px}footer{margin:20px}.intro{align-items:start}h1{font-size:30px}}@media(max-width:480px){.grid{grid-template-columns:1fr}.intro{flex-wrap:wrap}.product-info p{min-height:0}nav{gap:14px}.bar{gap:12px}.brand{font-size:26px}}
+</style>
+</head>
+<body>
+<header><div class="bar"><a class="brand" href="/">fieldnote<span>.</span></a><nav aria-label="Main"><a href="#collection">Collection</a><a href="#bag">Bag <span id="bag-count">0</span></a><a href="/health">Service health</a><span id="ops" class="ops" role="status">Operations unknown</span></nav></div></header>
+<main>
+<section class="intro"><div><p class="eyebrow">The everyday collection</p><h1>Good things. Well chosen.</h1><p class="muted">Sound, snapshots and everyday essentials.</p></div><button id="refresh" type="button">Refresh collection</button></section>
+<div class="layout"><section id="collection" aria-label="Products"><div class="filters"><input id="search" type="search" placeholder="Search products" aria-label="Search products"><select id="category" aria-label="Category"><option value="">All categories</option><option>Audio</option><option>Photography</option><option>Accessories</option></select></div><p id="catalog-error" class="notice" role="status"></p><p id="media-error" class="notice" role="status"></p><div id="products" class="grid" aria-live="polite"><p class="muted">Loading collection...</p></div></section>
+<aside id="bag"><h2>Your bag</h2><div id="cart"></div><div class="total"><span>Subtotal</span><span id="total">$0.00</span></div><button id="checkout" class="primary" disabled>Place demo order</button><p class="muted small">Demo checkout. No payment collected. No personal information required.</p><p id="checkout-error" class="notice" role="alert"></p><div id="receipt" class="receipt" role="status" hidden></div><form id="lookup" class="lookup"><label for="order-id">Find your order</label><input id="order-id" placeholder="Order reference" required maxlength="36"><button>Find order</button><p id="lookup-error" class="notice" role="status"></p></form></aside></div>
+</main><footer>Fieldnote &middot; SRE Day demo shop &middot; USD</footer>
+<script>
+'use strict';
+const byId = id => document.getElementById(id);
+const money = cents => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(cents / 100);
+let products = [], images = {}, catalogReady = false, busy = false, loading = false, mediaAt = 0;
+let cart = {}, pending = null;
+try { const saved = JSON.parse(localStorage.getItem('fieldnote-bag-v1') || '{}'); cart = saved.cart || {}; pending = saved.pending || null; } catch {}
+function save() { try { localStorage.setItem('fieldnote-bag-v1', JSON.stringify({ cart, pending })); } catch {} }
+function element(tag, text, className) { const node = document.createElement(tag); if (text) node.textContent = text; if (className) node.className = className; return node; }
+async function api(route, body) {
+  const response = await fetch(`/api/shop/${route}`, { method: body ? 'POST' : 'GET', headers: body ? { 'Content-Type': 'application/json' } : {}, body: body ? JSON.stringify(body) : undefined, cache: 'no-store', signal: AbortSignal.timeout(240000) });
+  const result = await response.json();
+  if (!response.ok) throw new Error(result.error || 'Shop temporarily unavailable.');
+  return result;
+}
+function change(id, difference) {
+  if (busy || pending) return;
+  cart[id] = Math.max(0, Math.min(10, (Number(cart[id]) || 0) + difference));
+  if (!cart[id]) delete cart[id];
+  save(); renderCart();
+}
+function renderProducts() {
+  const grid = byId('products'); grid.replaceChildren();
+  if (!catalogReady) { grid.append(element('p', 'Collection unavailable. Please try again.', 'muted')); return; }
+  const matches = products.filter(product => product.name.toLowerCase().includes(byId('search').value.toLowerCase()) && (!byId('category').value || product.category === byId('category').value));
+  for (const product of matches) {
+    const card = element('article', '', 'product'), media = element('div', '', 'media');
+    if (images[product.id]) { const image = element('img'); image.src = images[product.id]; image.alt = product.name; media.append(image); }
+    else media.append(element('span', 'Image unavailable'));
+    const info = element('div', '', 'product-info'), heading = element('div', '', 'product-heading');
+    heading.append(element('h3', product.name), element('span', money(product.price), 'price'));
+    const add = element('button', 'Add to bag'); add.type = 'button'; add.disabled = busy || !!pending; add.onclick = () => change(product.id, 1);
+    info.append(heading, element('p', product.description), add); card.append(media, info); grid.append(card);
+  }
+  if (!matches.length) grid.append(element('p', 'No products match your search.', 'muted'));
+}
+function renderCart() {
+  const container = byId('cart'); container.replaceChildren(); let total = 0, count = 0;
+  for (const [id, quantity] of Object.entries(cart)) {
+    if (!Number.isInteger(quantity) || quantity < 1 || quantity > 10) { delete cart[id]; continue; }
+    const product = products.find(item => item.id === id); count += quantity;
+    const row = element('div', '', 'cart-line'), top = element('div', '', 'cart-top');
+    top.append(element('span', product?.name || id), element('span', product ? money(product.price * quantity) : 'Unavailable')); row.append(top);
+    if (product) total += product.price * quantity;
+    const controls = element('div', '', 'quantity');
+    for (const [label, delta] of [['-', -1], ['+', 1]]) { const button = element('button', label); button.type = 'button'; button.setAttribute('aria-label', `${delta < 0 ? 'Decrease' : 'Increase'} ${product?.name || id}`); button.disabled = busy || !!pending; button.onclick = () => change(id, delta); controls.append(button); if (delta < 0) controls.append(element('output', String(quantity))); }
+    const remove = element('button', 'Remove', 'remove'); remove.disabled = busy || !!pending; remove.onclick = () => change(id, -10); controls.append(remove); row.append(controls); container.append(row);
+  }
+  if (!count) container.append(element('p', 'Your bag is empty.', 'muted'));
+  byId('bag-count').textContent = String(count); byId('total').textContent = catalogReady ? money(total) : 'Unavailable';
+  byId('checkout').disabled = busy || !catalogReady || !count;
+  byId('checkout').textContent = busy ? 'Placing order...' : pending ? 'Retry same order' : 'Place demo order';
+}
+async function refresh() {
+  if (loading || busy) return; loading = true; byId('refresh').disabled = true;
+  try {
+    const catalog = await api('catalog'); products = catalog.products; catalogReady = true; byId('catalog-error').textContent = '';
+  } catch { catalogReady = false; products = []; byId('catalog-error').textContent = 'The collection is temporarily unavailable. Your bag has been kept.'; }
+  renderProducts(); renderCart();
+  try { const media = await api('media'); images = media.images; mediaAt = Date.now(); byId('media-error').textContent = ''; }
+  catch { images = {}; mediaAt = 0; byId('media-error').textContent = 'Product images are temporarily unavailable.'; }
+  renderProducts(); loading = false; byId('refresh').disabled = false;
+}
+function receipt(order) {
+  const container = byId('receipt'); container.replaceChildren(element('strong', 'Order confirmed'), element('p', `Reference: ${order.id}`), element('p', `${money(order.total)} - simulated payment`));
+  for (const item of order.items) container.append(element('p', `${item.quantity} x ${item.name}`, 'small'));
+  container.hidden = false; byId('order-id').value = order.id;
+}
+byId('checkout').onclick = async () => {
+  if (busy || !catalogReady) return;
+  pending ||= { requestId: crypto.randomUUID(), items: Object.entries(cart).map(([id, quantity]) => ({ id, quantity })) }; save();
+  busy = true; renderCart(); renderProducts(); byId('checkout-error').textContent = '';
+  try { const order = await api('checkout', pending); receipt(order); cart = {}; pending = null; save(); }
+  catch (error) { byId('checkout-error').textContent = `${error.message} Your checkout reference is retained for a safe retry.`; }
+  finally { busy = false; renderCart(); renderProducts(); }
+};
+byId('lookup').onsubmit = async event => { event.preventDefault(); byId('lookup-error').textContent = ''; const id = byId('order-id').value.trim(); if (!/^[0-9a-f-]{36}$/i.test(id)) { byId('lookup-error').textContent = 'Enter a valid order reference.'; return; } try { receipt(await api(`orders/${id}`)); } catch (error) { byId('lookup-error').textContent = error.message; } };
+async function operations() {
+  if (!['localhost', '127.0.0.1', 'web'].includes(location.hostname)) return;
+  try { const response = await fetch('/api/operations', { signal: AbortSignal.timeout(8000) }); if (!response.ok) throw new Error(); const data = await response.json(); const checks = data.checks || []; const current = checks.filter(check => { const age = Date.now() - Date.parse(check.observedAt); return age >= 0 && age <= 180000; }); const failed = current.filter(check => check.state === 'failed').length; byId('ops').textContent = failed ? `${failed} operational issue${failed === 1 ? '' : 's'}` : current.length === 10 && current.every(check => check.state === 'healthy') ? 'Operations healthy' : 'Operations unknown'; byId('ops').dataset.failed = String(failed > 0); }
+  catch { byId('ops').textContent = 'Operations unknown'; byId('ops').dataset.failed = 'false'; }
+}
+byId('refresh').onclick = refresh; byId('search').oninput = renderProducts; byId('category').onchange = renderProducts;
+setInterval(() => { if (mediaAt && Date.now() - mediaAt > 60000) { images = {}; mediaAt = 0; byId('media-error').textContent = 'Product images need refreshing.'; renderProducts(); } }, 1000);
+setInterval(() => { if (!document.hidden) void refresh(); }, 30000); setInterval(operations, 10000);
+document.addEventListener('visibilitychange', () => { if (!document.hidden) void refresh(); });
+if (!['localhost', '127.0.0.1', 'web'].includes(location.hostname)) { document.querySelector('a[href="/health"]')?.remove(); byId('ops').remove(); }
+renderCart(); void refresh(); void operations();
+</script>
+</body>
+</html>
