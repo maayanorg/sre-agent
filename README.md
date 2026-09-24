@@ -6,6 +6,8 @@ This guide explains the files and the order to run them. **The lab is already de
 
 For all 28 DNS/network/permission/VM/AKS/resource/monitoring faults, use [the scenario catalog and execution guide](SCENARIOS.md). Each has its own script with Inject, Status, Verify and Reset. The dashboard separates six application checks from ten operations/observability checks, so an operator permission failure or telemetry gap is visible even while applications remain healthy.
 
+For the recommended presentation order, follow [the phased test runbook](TEST-RUNBOOK.md): Blob images, Key Vault checkout, then every remaining scenario, with commands, expected impact, alert expectations, SRE prompts and recovery checks.
+
 Run commands in **PowerShell 7 from the workspace root**, the folder containing this README. You need Node.js and Azure CLI installed, and Azure CLI signed in with your authorized lab account. Initial deployment also needs Bicep support in Azure CLI and `ssh-keygen`.
 
 The scripts target subscription `15ba7e94-568d-4ba9-bb5d-29ed107ac109` and resource group `rg-srelab-swedencentral-001` in Sweden Central. Their shared helper fixes this scope; switching the CLI default subscription does not retarget the lab.

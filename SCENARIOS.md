@@ -2,6 +2,8 @@
 
 **Shop deployed:** [SHOP.md](SHOP.md) maps every scenario to shopping or operational impact. BlobEndpoint, VaultEndpoint and DiskFull have live shop failure/recovery evidence. Other health-based Verify results are not proof of shopping behavior.
 
+For an ordered rehearsal with five phases and a scenario-specific SRE prompt for every test, use [TEST-RUNBOOK.md](TEST-RUNBOOK.md). It also distinguishes expected automatic alerts from known detection gaps.
+
 There are 28 additional scenarios plus the existing web scale-to-zero outage. Each scenario has its own entry script, saved-state reset, status/investigation action and evidence verification. They affect only the existing SRE lab. No extra always-on Azure resource is required.
 
 ## Execution Order
