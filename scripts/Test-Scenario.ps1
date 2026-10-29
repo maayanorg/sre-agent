@@ -19,6 +19,7 @@ if ($operational) {
     else { throw 'No conclusive application evidence. Observation path may be unavailable.' }
 }
 if (($Expected -eq 'Injected') -ne $failed) { throw "Expected $Expected symptom for $Scenario has not been observed. Allow propagation, then retry Verify or Reset; recovery state is retained." }
+if ($Scenario -in @('RouteBlackhole', 'RouteWrongHop')) { Assert-ScenarioRoute -Scenario $Scenario -Expected $Expected }
 $evidence = @{ scenario = $Scenario; expected = $Expected; verifiedAt = [DateTime]::UtcNow.ToString('o'); check = $definition.check; snapshot = $snapshot }
 Write-LabJson (Join-Path $script:StateDirectory "verification/$Scenario-$Expected.json") $evidence
 Write-Host "$Scenario / $Expected verified from $($definition.check) observation."

@@ -13,6 +13,27 @@ function Get-ArmChild {
     return @($items.value | Where-Object { $_.id -ieq $Id })
 }
 
+function Assert-ScenarioRoute {
+    param([string]$Scenario, [ValidateSet('Injected', 'Recovered')][string]$Expected)
+    $definition = Get-ScenarioDefinition $Scenario
+    if ($Scenario -notin @('RouteBlackhole', 'RouteWrongHop')) { throw "Not a lab route scenario: $Scenario" }
+    $routeId = "$script:GroupId$($definition.path)"
+    $routes = @(Get-ArmChild -Id $routeId -Api $definition.api)
+    if ($Expected -eq 'Recovered') {
+        if ($routes.Count -ne 0) { throw "Incident route still exists: $routeId" }
+        return
+    }
+    if ($routes.Count -ne 1) { throw "Expected one injected incident route: $routeId" }
+    $properties = ConvertTo-LabMap $routes[0].properties
+    $hopType = if ($Scenario -eq 'RouteWrongHop') { 'VirtualAppliance' } else { 'None' }
+    $hopAddress = if ($properties.ContainsKey('nextHopIpAddress')) { $properties.nextHopIpAddress } else { $null }
+    if ($properties.addressPrefix -ne '10.70.2.4/32' -or $properties.nextHopType -ne $hopType -or
+        ($Scenario -eq 'RouteWrongHop' -and $hopAddress -ne '10.70.1.250') -or
+        ($Scenario -eq 'RouteBlackhole' -and $hopAddress)) {
+        throw "Incident route differs from the $Scenario injection; refusing to treat it as owned."
+    }
+}
+
 function Get-RestorableBody {
     param($Resource)
     $source = ConvertTo-LabMap $Resource
@@ -179,6 +200,11 @@ function Set-ScenarioMutation {
         { $_ -in @('ArmDelete', 'ArmUpdate', 'ArmCreate', 'Role', 'Endpoint') } {
             $delete = if ($Restore) { $State.kind -eq 'ArmCreate' } else { $State.kind -in @('ArmDelete', 'Role') }
             if ($delete) {
+                if ($Restore -and $State.scenario -in @('RouteBlackhole', 'RouteWrongHop')) {
+                    $definition = Get-ScenarioDefinition $State.scenario
+                    if ($State.id -ine "$script:GroupId$($definition.path)" -or $State.api -ne $definition.api) { throw 'Incident route recovery scope mismatch.' }
+                    if (@(Get-ArmChild $State.id $State.api).Count) { Assert-ScenarioRoute -Scenario $State.scenario -Expected Injected }
+                }
                 if (@(Get-ArmChild $State.id $State.api).Count) { $null = Invoke-LabRest -Method DELETE -Id $State.id -Api $State.api }
             } else {
                 $body = if ($Restore) { $State.original } else { $State.injectBody }
