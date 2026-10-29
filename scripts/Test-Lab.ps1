@@ -1,7 +1,7 @@
 [CmdletBinding()]
 param([switch]$IncludeTelemetry)
 . "$PSScriptRoot/Common.ps1"
-$lab = Get-Lab
+$lab = Get-Lab -AllowCachedMetadata
 $results = @()
 foreach ($target in @('client', 'backend')) {
     $results += Invoke-LabVm -Target $target -Command 'set -e; test -f /opt/srelab/bootstrap-complete; systemctl is-active srelab; mountpoint /mnt/srelab-data; test $(df --output=pcent /mnt/srelab-data | tail -1 | tr -dc 0-9) -lt 95'

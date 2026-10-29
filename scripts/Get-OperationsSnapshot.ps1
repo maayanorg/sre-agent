@@ -1,7 +1,7 @@
 [CmdletBinding()]
-param()
+param([switch]$AllowCachedMetadata)
 . "$PSScriptRoot/ScenarioEngine.ps1"
-$lab = Get-Lab
+$lab = Get-Lab -AllowCachedMetadata:$AllowCachedMetadata
 $checks = [Collections.Generic.List[object]]::new()
 function Add-Observation {
     param([string]$Id, [string]$State, [string]$Detail)

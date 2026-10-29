@@ -24,6 +24,10 @@ if (-not (Test-Path "$keyPath.pub")) {
     if ($LASTEXITCODE -ne 0) { throw 'SSH key generation failed.' }
 }
 $parameterPath = Join-Path $script:StateDirectory 'parameters.json'
+$existingVmNames = @(Invoke-Az @('vm', 'list', '-g', $script:ResourceGroup, '--query', '[].name'))
+$existingNetworks = @(Invoke-Az @('network', 'vnet', 'list', '-g', $script:ResourceGroup, '--query', '[].{name:name,subnets:subnets[].{name:name,nsgId:networkSecurityGroup.id}}'))
+$aksSubnetNsgId = [string]($existingNetworks | Where-Object name -EQ 'vnet-srelab-aks-swc-001' | ForEach-Object subnets | Where-Object name -EQ 'snet-aks' | ForEach-Object nsgId)
+$privateEndpointSubnetNsgId = [string]($existingNetworks | Where-Object name -EQ 'vnet-srelab-services-swc-001' | ForEach-Object subnets | Where-Object name -EQ 'snet-private-endpoints' | ForEach-Object nsgId)
 Write-LabJson $parameterPath @{
     '$schema' = 'https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#'
     contentVersion = '1.0.0.0'
@@ -32,6 +36,9 @@ Write-LabJson $parameterPath @{
         operatorObjectId = @{ value = $operatorId }
         vmSize = @{ value = $VmSize }
         aksVmSize = @{ value = $AksVmSize }
+        existingVmNames = @{ value = $existingVmNames }
+        aksSubnetNsgId = @{ value = $aksSubnetNsgId }
+        privateEndpointSubnetNsgId = @{ value = $privateEndpointSubnetNsgId }
     }
 }
 $template = Join-Path $script:Root 'infra/main.bicep'

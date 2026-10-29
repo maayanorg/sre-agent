@@ -5,6 +5,9 @@ param sshPublicKey string
 param operatorObjectId string
 param vmSize string = 'Standard_B1ms'
 param aksVmSize string = 'Standard_D2s_v4'
+param existingVmNames array = []
+param aksSubnetNsgId string = ''
+param privateEndpointSubnetNsgId string = ''
 param tags object = {
   Project: 'SRE-Day'
   Purpose: 'IncidentResponseLab'
@@ -104,11 +107,11 @@ resource network 'Microsoft.Network/virtualNetworks@2024-05-01' = {
       }
       {
         name: 'snet-private-endpoints'
-        properties: {
+        properties: union({
           addressPrefix: '10.70.3.0/24'
           privateEndpointNetworkPolicies: 'Disabled'
           defaultOutboundAccess: false
-        }
+        }, empty(privateEndpointSubnetNsgId) ? {} : { networkSecurityGroup: { id: privateEndpointSubnetNsgId } })
       }
     ]
   }
@@ -122,7 +125,7 @@ resource aksNetwork 'Microsoft.Network/virtualNetworks@2024-05-01' = {
     addressSpace: { addressPrefixes: ['10.71.0.0/16'] }
     subnets: [{
       name: 'snet-aks'
-      properties: { addressPrefix: '10.71.0.0/22' }
+      properties: union({ addressPrefix: '10.71.0.0/22' }, empty(aksSubnetNsgId) ? {} : { networkSecurityGroup: { id: aksSubnetNsgId } })
     }]
   }
 }
@@ -295,6 +298,7 @@ resource dcr 'Microsoft.Insights/dataCollectionRules@2023-03-11' = {
 module client './vm.bicep' = {
   params: {
     name: 'vm-srelab-client-swc-001'
+    includeBootstrap: !contains(existingVmNames, 'vm-srelab-client-swc-001')
     location: location
     tags: tags
     size: vmSize
@@ -313,6 +317,7 @@ module client './vm.bicep' = {
 module backend './vm.bicep' = {
   params: {
     name: 'vm-srelab-backend-swc-001'
+    includeBootstrap: !contains(existingVmNames, 'vm-srelab-backend-swc-001')
     location: location
     tags: tags
     size: vmSize

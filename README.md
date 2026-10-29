@@ -99,6 +99,8 @@ Initialization already deploys the frontend, so you do not also need to run the 
 
 Optional infrastructure validation: `./scripts/Deploy-Lab.ps1 -ValidateOnly` stops before the resource deployment, but **is not completely read-only**: it can create the resource group, generate an SSH key and write local parameters.
 
+For existing VMs, the deployment script omits immutable bootstrap `customData`; new VMs still receive the bootstrap. Apply VM application changes with `./scripts/Update-VmWorkload.ps1`, not an infrastructure redeployment. The script also discovers and retains existing AKS and private-endpoint subnet NSG associations without managing their rules. Direct Bicep deployments must supply equivalent `existingVmNames`, `aksSubnetNsgId` and `privateEndpointSubnetNsgId` parameters for an existing lab.
+
 ## After Changing Frontend Code
 
 With no active outage, run:

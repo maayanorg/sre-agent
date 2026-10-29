@@ -13,7 +13,7 @@ foreach ($source in @('workload/server.js', 'workload/shop.cjs', 'workload/front
 }
 & node --test (Join-Path $root 'tests/frontend.test.cjs') (Join-Path $root 'tests/operations.test.cjs') (Join-Path $root 'tests/shop.test.cjs') (Join-Path $root 'tests/shop-proxy.test.cjs') (Join-Path $root 'tests/seed-shop.test.cjs')
 if ($LASTEXITCODE -ne 0) { $failures += 'Frontend behavior tests failed.' }
-foreach ($test in @('ScenarioCatalog.Tests.ps1', 'ScenarioEngine.Tests.ps1', 'PublicShop.Tests.ps1')) {
+foreach ($test in @('ScenarioCatalog.Tests.ps1', 'ScenarioEngine.Tests.ps1', 'PublicShop.Tests.ps1', 'LabMetadata.Tests.ps1')) {
     try { & (Join-Path $PSScriptRoot $test) } catch { $failures += "$test : $_" }
 }
 if ($failures.Count) { throw ($failures -join "`n") }

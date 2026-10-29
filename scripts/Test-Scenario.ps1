@@ -2,10 +2,10 @@
 param([Parameter(Mandatory)][string]$Scenario, [ValidateSet('Injected', 'Recovered')][string]$Expected = 'Injected')
 . "$PSScriptRoot/ScenarioEngine.ps1"
 $definition = Get-ScenarioDefinition $Scenario
-$null = Get-Lab
+$null = Get-Lab -AllowCachedMetadata
 $operational = $definition.check -in @('operator', 'cpu', 'memory', 'ama')
 if ($operational) {
-    $snapshot = & "$PSScriptRoot/Get-OperationsSnapshot.ps1" | ConvertFrom-Json
+    $snapshot = & "$PSScriptRoot/Get-OperationsSnapshot.ps1" -AllowCachedMetadata | ConvertFrom-Json
     $check = @($snapshot.checks | Where-Object id -eq $definition.check)
     if ($check.Count -ne 1 -or $check[0].state -eq 'unknown') { throw 'No conclusive operational evidence. Check observation permissions and retry.' }
     $failed = $check[0].state -eq 'failed'

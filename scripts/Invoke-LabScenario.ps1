@@ -6,7 +6,7 @@ param(
 )
 . "$PSScriptRoot/ScenarioEngine.ps1"
 $definition = Get-ScenarioDefinition $Scenario
-$lab = Get-Lab
+$lab = Get-Lab -AllowCachedMetadata:($Action -in @('Reset', 'Verify'))
 $null = New-Item -ItemType Directory -Path $script:StateDirectory -Force
 $statePath = Join-Path $script:StateDirectory 'active-incident.json'
 $lock = [IO.File]::Open((Join-Path $script:StateDirectory 'incident.lock'), 'OpenOrCreate', 'ReadWrite', 'None')

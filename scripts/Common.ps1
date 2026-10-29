@@ -36,9 +36,31 @@ function Assert-Lab {
 }
 
 function Get-Lab {
+    [CmdletBinding()]
+    param([switch]$AllowCachedMetadata)
     Assert-Lab
     $deployment = Invoke-Az @('deployment', 'group', 'show', '-g', $script:ResourceGroup, '-n', 'srelab-baseline')
-    if ($deployment.properties.provisioningState -ne 'Succeeded') { throw 'Baseline deployment has not succeeded.' }
+    if ($deployment.properties.provisioningState -ne 'Succeeded') {
+        $cachePath = Join-Path $script:StateDirectory 'lab.json'
+        if (-not $AllowCachedMetadata -or $deployment.properties.provisioningState -notin @('Failed', 'Canceled') -or -not (Test-Path $cachePath)) {
+            throw "Baseline deployment state is $($deployment.properties.provisioningState). Inspect the failed deployment operations before redeploying."
+        }
+        $cached = Get-Content $cachePath -Raw | ConvertFrom-Json
+        if ($cached.subscriptionId -ne $script:Subscription -or $cached.resourceGroup -ne $script:ResourceGroup) {
+            throw 'Cached lab metadata does not match the configured subscription and resource group.'
+        }
+        foreach ($resourceId in @($cached.agentId, $cached.workspaceId, $cached.aksId)) {
+            if (-not $resourceId.StartsWith("$script:GroupId/", [StringComparison]::OrdinalIgnoreCase)) {
+                throw 'Cached lab resource is outside lab scope.'
+            }
+        }
+        $workspace = Invoke-LabRest -Id $cached.workspaceId -Api '2023-09-01'
+        if ($workspace.properties.customerId -ne $cached.workspaceCustomerId) {
+            throw 'Cached workspace customer ID does not match the live workspace.'
+        }
+        Write-Warning "Baseline deployment state is $($deployment.properties.provisioningState). Using scoped cached metadata for live health checks; this does not verify deployment success."
+        return $cached
+    }
     return $deployment.properties.outputs.lab.value
 }
 

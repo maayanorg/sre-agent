@@ -13,6 +13,7 @@ param storageName string
 param vaultName string
 param resourceGroupId string
 param adminUsername string = 'labadmin'
+param includeBootstrap bool = true
 
 var appCode = loadFileAsBase64('../workload/server.js')
 var bootstrap = replace(replace(replace(replace(replace(replace(replace(loadTextContent('../workload/bootstrap.sh'), '__APP_BASE64__', appCode), '__SHOP_BASE64__', loadFileAsBase64('../workload/shop.cjs')), '__ROLE__', role), '__STORAGE__', storageName), '__VAULT__', vaultName), '__CLIENT_ID__', identityClientId), '__RG_ID__', resourceGroupId)
@@ -40,15 +41,14 @@ resource vm 'Microsoft.Compute/virtualMachines@2024-07-01' = {
       imageReference: { publisher: 'Canonical', offer: 'ubuntu-24_04-lts', sku: 'server', version: 'latest' }
       osDisk: { createOption: 'FromImage', diskSizeGB: 32, managedDisk: { storageAccountType: 'Standard_LRS' }, deleteOption: 'Delete' }
     }
-    osProfile: {
+    osProfile: union({
       computerName: role
       adminUsername: adminUsername
-      customData: base64(bootstrap)
       linuxConfiguration: {
         disablePasswordAuthentication: true
         ssh: { publicKeys: [{ path: '/home/${adminUsername}/.ssh/authorized_keys', keyData: sshPublicKey }] }
       }
-    }
+    }, includeBootstrap ? { customData: base64(bootstrap) } : {})
     diagnosticsProfile: { bootDiagnostics: { enabled: true } }
     securityProfile: { securityType: 'TrustedLaunch', uefiSettings: { secureBootEnabled: true, vTpmEnabled: true } }
   }
