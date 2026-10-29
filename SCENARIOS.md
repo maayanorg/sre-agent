@@ -31,6 +31,8 @@ In the second terminal, choose one scenario. Every script below accepts the same
 
 `Reset` restores captured state and verifies recovery before deleting the active record. If verification fails, the record remains. A subsequent Reset retries verification without repeating a completed restore. Do not delete recovery state or redeploy the baseline to hide an unresolved incident.
 
+If the public shop says "Collection unavailable" after a RouteWrongHop rehearsal, inspect the reserved `srelab-incident` route on `rt-srelab-client-swc-001`: the injected `10.70.2.4/32` route points to unused next hop `10.70.1.250`, blocking the client-to-backend path. From the **same operator workspace holding the active incident state**, run `./scripts/scenarios/RouteWrongHop.ps1 -Action Reset`. Reset refuses to delete a route whose hop or scope has changed, and does not clear the recovery record until the route is absent and the client check has recovered. Then run `./scripts/Test-PublicShop.ps1` (without `-IncludeCheckout`) to verify catalog and images over HTTPS. If the state file is missing or the route differs, stop and have an authorized operator inspect the exact route before any manual change; do not redeploy the baseline or remove unrelated routes. This guidance does not assert that this incident has been restored.
+
 ## Scenario Catalog
 
 Paths below are individual executable entry scripts. Application checks may show secondary failures when a client dependency fails or a synchronous Azure request holds up the client process.
