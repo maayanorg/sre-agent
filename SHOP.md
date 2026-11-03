@@ -25,6 +25,12 @@ The anonymous demo proxy limits each web process to 120 accepted API requests an
 
 The local preview runs at http://127.0.0.1:8092 with an explicit fixture banner. It uses local images and a local simulated authorization key, not Azure. Its orders are stored under `.state/shop-preview/orders`. This is UI/behavior evidence, not proof of Azure fault scenarios.
 
+### Restore missing product images
+
+When catalog works but `/api/shop/media` returns 503, check the Blob endpoint and its private DNS binding. **Use the original operator workspace:** if `.state/active-incident.json` records `BlobEndpoint`, restore with `./scripts/scenarios/BlobEndpoint.ps1 -Action Reset` so the captured state and verification are preserved. Never discard that record to use the fallback.
+
+If no incident is recorded and the Blob endpoint is missing, an authorized lab operator can run `./scripts/Restore-ShopBlobEndpoint.ps1 -Action Plan` to preview a **Blob-only** incremental deployment, then `./scripts/Restore-ShopBlobEndpoint.ps1 -Action Restore` to create the missing endpoint and its DNS zone group. The script refuses an existing endpoint, DNS record, storage connection, unexpected subnet/storage/DNS scope, or any recorded incident. It checks what-if for exactly two creates and verifies endpoint approval, DNS, HTTPS and four JPEGs; rerun with `-Action Verify` if DNS propagation delays the public check. No images are seeded, no storage firewall is opened, and no other endpoint is changed. Do not run from a fresh clone while a different operator workspace may still hold an active incident record; coordinate with the scenario owner first. The operator needs scoped network/deployment write permission; the SRE Agent's Reader identity cannot perform the restore.
+
 ## Resource Dependencies
 
 | Component | Shop responsibility | Actual dependency after deployment |
